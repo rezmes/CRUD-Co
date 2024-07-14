@@ -1,5 +1,3 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
@@ -7,33 +5,24 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
 
-import * as strings from 'CrudCoWebPartStrings';
+import * as React from 'react';
+import * as ReactDom from 'react-dom';
 import CrudCo from './components/CrudCo';
 import { ICrudCoProps } from './components/ICrudCoProps';
 
-export interface ICrudCoWebPartProps {
-  description: string;
-}
-
-export default class CrudCoWebPart extends BaseClientSideWebPart<ICrudCoWebPartProps> {
+export default class CrudCoWebPart extends BaseClientSideWebPart<ICrudCoProps> {
 
   public render(): void {
-    const element: React.ReactElement<ICrudCoProps > = React.createElement(
+    const element: React.ReactElement<ICrudCoProps> = React.createElement(
       CrudCo,
       {
-        description: this.properties.description
+        description: this.properties.description,
+        listName: this.properties.listName,
+        context: this.context  // Ensure you're passing this.context
       }
     );
 
     ReactDom.render(element, this.domElement);
-  }
-
-  protected onDispose(): void {
-    ReactDom.unmountComponentAtNode(this.domElement);
-  }
-
-  protected get dataVersion(): Version {
-    return Version.parse('1.0');
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -41,14 +30,17 @@ export default class CrudCoWebPart extends BaseClientSideWebPart<ICrudCoWebPartP
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: "Configure your CRUD Web Part"
           },
           groups: [
             {
-              groupName: strings.BasicGroupName,
+              groupName: "General",
               groupFields: [
                 PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                  label: "Description"
+                }),
+                PropertyPaneTextField('listName', {
+                  label: "List Name"
                 })
               ]
             }
@@ -56,5 +48,9 @@ export default class CrudCoWebPart extends BaseClientSideWebPart<ICrudCoWebPartP
         }
       ]
     };
+  }
+
+  protected get dataVersion(): Version {
+    return Version.parse('1.0');
   }
 }
